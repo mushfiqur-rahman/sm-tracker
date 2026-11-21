@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: { default: "PostPilot — schedule to every social network", template: "%s · PostPilot" },
+  title: { default: "SM Tracking — Social Media Tracking & Scheduling", template: "%s · SM Tracking" },
   description: "Plan, schedule and publish to Facebook, Instagram, X, LinkedIn, TikTok, YouTube and more — with your whole team.",
 };
 

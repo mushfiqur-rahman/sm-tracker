@@ -10,7 +10,7 @@ export default async function MarketingLayout({ children }: { children: React.Re
     <div className="flex min-h-dvh flex-col">
       <header className="sticky top-0 z-20 border-b border-border bg-bg/85 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-          <Link href="/" aria-label="PostPilot home"><Logo /></Link>
+          <Link href="/" aria-label="SM Tracking home"><Logo /></Link>
           <nav className="hidden items-center gap-6 text-sm text-subtle md:flex">
             <Link href="/#features" className="hover:text-fg">Features</Link>
             <Link href="/#channels" className="hover:text-fg">Channels</Link>

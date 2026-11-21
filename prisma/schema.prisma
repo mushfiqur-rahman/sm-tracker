@@ -1,4 +1,4 @@
-// PostPilot data model — MySQL / MariaDB (works with XAMPP, MySQL 8, MariaDB 10.4+).
+// SM Tracking data model — MySQL / MariaDB (works with XAMPP, MySQL 8, MariaDB 10.4+).
 // Status/role fields are plain strings validated in code (see src/lib/roles.ts and the
 // comments below), which keeps the schema portable to PostgreSQL as well.
 

@@ -1,5 +1,5 @@
 {
-  "name": "postpilot",
+  "name": "sm-tracking",
   "version": "0.1.0",
   "private": true,
   "description": "Multi-tenant SaaS for scheduling and publishing posts to every social network.",

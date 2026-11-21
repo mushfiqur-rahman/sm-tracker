@@ -1,4 +1,4 @@
-# PostPilot — social media scheduling SaaS
+# SM Tracking — Social Media Tracking & Scheduling SaaS
 
 Multi-tenant SaaS where a business connects all of its social media accounts, then its team writes, approves and schedules posts — minutes or months ahead — from one calendar.
 
@@ -26,10 +26,10 @@ copy .env.example .env
 
 Edit `.env`:
 
-- `DATABASE_URL="mysql://root:@localhost:3306/postpilot"` — XAMPP default (user `root`, no password). If you set a root password: `mysql://root:YOURPASS@localhost:3306/postpilot`.
+- `DATABASE_URL="mysql://root:@localhost:3306/sm_tracking"` — XAMPP default (user `root`, no password). If you set a root password: `mysql://root:YOURPASS@localhost:3306/sm_tracking`.
 - `AUTH_SECRET` — any random string of 32+ characters.
 
-Create the tables (the `postpilot` database is created automatically) and load demo data:
+Create the tables (the `sm_tracking` database is created automatically) and load demo data:
 
 ```powershell
 npm run db:push

@@ -29,7 +29,7 @@ export default async function SettingsPage() {
         <Card>
           <CardHeader title="Language" />
           <p className="p-5 text-sm text-subtle">
-            Use your browser’s built-in translation (for example “Translate this page” in Chrome, Edge or Safari) to view PostPilot in your language.
+            Use your browser’s built-in translation (for example “Translate this page” in Chrome, Edge or Safari) to view SM Tracking in your language.
             Post text is never translated, so you always see exactly what will be published.
           </p>
         </Card>

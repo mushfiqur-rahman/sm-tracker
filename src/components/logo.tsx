@@ -7,7 +7,7 @@ export function Logo({ withText = true }: { withText?: boolean }) {
           <path d="M11.5 13.5L20 4" />
         </svg>
       </span>
-      {withText && <span className="notranslate text-[17px]">PostPilot</span>}
+      {withText && <span className="notranslate text-[17px]">SM Tracking</span>}
     </span>
   );
 }

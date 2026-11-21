@@ -23,7 +23,7 @@ export function LoginForm({ invite }: { invite?: string }) {
       <Field label="Password" htmlFor="password"><Input id="password" name="password" type="password" autoComplete="current-password" required /></Field>
       <SubmitButton className="w-full" pendingText="Signing in…">Sign in</SubmitButton>
       <p className="text-center text-sm text-subtle">
-        New to PostPilot? <Link className="font-medium text-brand hover:underline" href={invite ? `/signup?invite=${invite}` : "/signup"}>Create an account</Link>
+        New to SM Tracking? <Link className="font-medium text-brand hover:underline" href={invite ? `/signup?invite=${invite}` : "/signup"}>Create an account</Link>
       </p>
     </form>
   );

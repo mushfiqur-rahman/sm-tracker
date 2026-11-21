@@ -48,7 +48,7 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
           </div>
         )}
       </div>
-      <p className="mt-6 text-center text-xs text-subtle">Invitation sent to {inv.email}. <Link href="/" className="underline">What is PostPilot?</Link></p>
+      <p className="mt-6 text-center text-xs text-subtle">Invitation sent to {inv.email}. <Link href="/" className="underline">What is SM Tracking?</Link></p>
     </Card>
   );
 }
