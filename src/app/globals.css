@@ -1,0 +1,89 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Design tokens — every colour in the UI comes from here, so light/dark stay in sync. */
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --muted: #f0f2f5;
+  --border: #e3e6eb;
+  --fg: #111827;
+  --subtle: #5b6473;
+  --brand: #4f46e5;
+  --brand-hover: #4338ca;
+  --brand-fg: #ffffff;
+  --brand-soft: #eef0ff;
+  --ok: #059669;
+  --ok-soft: #e7f7f0;
+  --warn: #b45309;
+  --warn-soft: #fdf3e2;
+  --danger: #dc2626;
+  --danger-soft: #fdecec;
+  --ring: #818cf8;
+  color-scheme: light;
+}
+
+.dark {
+  --bg: #0c0e13;
+  --surface: #14171e;
+  --muted: #1b1f28;
+  --border: #272c37;
+  --fg: #eceef2;
+  --subtle: #98a0ae;
+  --brand: #818cf8;
+  --brand-hover: #a5b4fc;
+  --brand-fg: #0c0e13;
+  --brand-soft: #1f2140;
+  --ok: #34d399;
+  --ok-soft: #10291f;
+  --warn: #fbbf24;
+  --warn-soft: #2b2310;
+  --danger: #f87171;
+  --danger-soft: #2e1414;
+  --ring: #6366f1;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-fg: var(--fg);
+  --color-subtle: var(--subtle);
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-fg: var(--brand-fg);
+  --color-brand-soft: var(--brand-soft);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-ring: var(--ring);
+  /* Multi-script stack: Latin/Cyrillic/Greek/Vietnamese via Inter + Noto Sans, plus Noto for
+     Arabic, Bengali, Devanagari, Thai and Hebrew, then OS CJK fonts. Google Fonts serves only
+     the unicode ranges a page actually uses, so this stays light. */
+  --font-sans: "Inter", "Noto Sans", "Noto Sans Arabic", "Noto Sans Bengali", "Noto Sans Devanagari",
+    "Noto Sans Thai", "Noto Sans Hebrew", system-ui, -apple-system, "Segoe UI", "PingFang SC",
+    "Hiragino Sans", "Microsoft YaHei", "Malgun Gothic", sans-serif;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "cv11", "ss01";
+}
+
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
