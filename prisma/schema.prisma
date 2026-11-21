@@ -1,0 +1,203 @@
+// PostPilot data model — MySQL / MariaDB (works with XAMPP, MySQL 8, MariaDB 10.4+).
+// Status/role fields are plain strings validated in code (see src/lib/roles.ts and the
+// comments below), which keeps the schema portable to PostgreSQL as well.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime @default(now())
+
+  memberships Membership[]
+  posts       Post[]        @relation("PostAuthor")
+  approvals   Post[]        @relation("PostApprover")
+  media       MediaAsset[]
+  invitations Invitation[]  @relation("InvitedBy")
+  auditLogs   AuditLog[]
+}
+
+model Organization {
+  id                   String    @id @default(cuid())
+  name                 String
+  timezone             String    @default("UTC")
+  plan                 String    @default("free") // free | starter | growth | business
+  planStatus           String    @default("active") // active | past_due | canceled
+  stripeCustomerId     String?   @unique
+  stripeSubscriptionId String?   @unique
+  currentPeriodEnd     DateTime?
+  createdAt            DateTime  @default(now())
+
+  memberships    Membership[]
+  invitations    Invitation[]
+  socialAccounts SocialAccount[]
+  posts          Post[]
+  media          MediaAsset[]
+  auditLogs      AuditLog[]
+}
+
+model Membership {
+  id        String   @id @default(cuid())
+  userId    String
+  orgId     String
+  role      String // OWNER | ADMIN | EDITOR | CONTRIBUTOR | VIEWER
+  createdAt DateTime @default(now())
+
+  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization        @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  // Empty = access to every social account in the workspace.
+  accounts     AccountAssignment[]
+
+  @@unique([userId, orgId])
+}
+
+// Restricts a member to specific social accounts (e.g. an employee who only runs Instagram).
+model AccountAssignment {
+  membershipId    String
+  socialAccountId String
+
+  membership    Membership    @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+  socialAccount SocialAccount @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
+
+  @@id([membershipId, socialAccountId])
+}
+
+model Invitation {
+  id          String    @id @default(cuid())
+  orgId       String
+  email       String
+  role        String
+  token       String    @unique
+  accountIds  String    @default("[]") @db.Text // JSON array of SocialAccount ids to assign on accept
+  invitedById String
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  invitedBy    User         @relation("InvitedBy", fields: [invitedById], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+}
+
+model SocialAccount {
+  id             String    @id @default(cuid())
+  orgId          String
+  platform       String // see PLATFORMS in src/lib/platforms.ts
+  externalId     String
+  name           String
+  handle         String?
+  avatarUrl      String?   @db.Text
+  accessToken    String    @db.Text // AES-256-GCM encrypted
+  refreshToken   String?   @db.Text // AES-256-GCM encrypted
+  tokenExpiresAt DateTime?
+  meta           String    @default("{}") @db.Text // JSON: instance URL, page id, board ids, etc.
+  status         String    @default("ACTIVE") // ACTIVE | NEEDS_RECONNECT | DISABLED
+  isSandbox      Boolean   @default(false)
+  connectedById  String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organization Organization        @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  targets      PostTarget[]
+  assignments  AccountAssignment[]
+
+  @@unique([orgId, platform, externalId])
+}
+
+model MediaAsset {
+  id           String   @id @default(cuid())
+  orgId        String
+  uploadedById String
+  fileName     String   @db.VarChar(255)
+  storageKey   String   @unique
+  mimeType     String
+  sizeBytes    Int
+  createdAt    DateTime @default(now())
+
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  uploadedBy   User         @relation(fields: [uploadedById], references: [id], onDelete: Cascade)
+  posts        PostMedia[]
+
+  @@index([orgId])
+}
+
+model Post {
+  id           String    @id @default(cuid())
+  orgId        String
+  authorId     String
+  content      String    @db.MediumText
+  // DRAFT | PENDING_APPROVAL | SCHEDULED | PUBLISHING | PUBLISHED | PARTIAL | FAILED
+  status       String    @default("DRAFT")
+  scheduledAt  DateTime? // UTC instant
+  timezone     String    @default("UTC") // timezone the author picked, for display
+  approvedById String?
+  publishedAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  author       User         @relation("PostAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  approvedBy   User?        @relation("PostApprover", fields: [approvedById], references: [id])
+  media        PostMedia[]
+  targets      PostTarget[]
+
+  @@index([orgId, status])
+  @@index([orgId, scheduledAt])
+}
+
+model PostMedia {
+  postId  String
+  mediaId String
+  order   Int
+
+  post  Post       @relation(fields: [postId], references: [id], onDelete: Cascade)
+  media MediaAsset @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@id([postId, mediaId])
+}
+
+// One post published to one social account.
+model PostTarget {
+  id              String    @id @default(cuid())
+  postId          String
+  socialAccountId String
+  contentOverride String?   @db.MediumText // per-network caption
+  options         String    @default("{}") @db.Text // JSON: youtube title, pinterest board, tiktok privacy…
+  status          String    @default("PENDING") // PENDING | PUBLISHING | PUBLISHED | FAILED | CANCELLED
+  externalId      String?
+  externalUrl     String?   @db.Text
+  error           String?   @db.Text
+  attempts        Int       @default(0)
+  nextAttemptAt   DateTime?
+  publishedAt     DateTime?
+
+  post          Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
+  socialAccount SocialAccount @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, socialAccountId])
+  @@index([status, nextAttemptAt])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  orgId     String
+  userId    String?
+  action    String
+  details   String   @default("") @db.Text
+  createdAt DateTime @default(now())
+
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user         User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([orgId, createdAt])
+}
